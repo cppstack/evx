@@ -1,7 +1,7 @@
 add_library(evx
             core/event_loop.cpp
-            core/poller/poller.cpp
-            core/poller/poll_poller.cpp
+            core/poller.cpp
+            core/pollers/poll_poller.cpp
             )
 
 target_compile_options(evx PRIVATE -Wall -Wextra -Wpointer-arith)

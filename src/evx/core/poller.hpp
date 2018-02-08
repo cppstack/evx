@@ -1,7 +1,7 @@
 #ifndef _CST_EVX_POLLER_HPP
 #define _CST_EVX_POLLER_HPP
 
-#include <cst/evx/core/event_loop.hpp>
+#include <cst/evx/core/common.hpp>
 #include <memory>
 
 namespace cst {
@@ -20,15 +20,15 @@ public:
         : loop_(loop)
     { }
 
+    virtual void modify(int fd, int nev) = 0;
     virtual void poll(int timeout) = 0;
 
     virtual ~poller() = default;
 
 protected:
-    event_loop& loop_;
+    const logger_ptr& logger() const noexcept;
 
-    auto logger() const noexcept -> decltype(loop_.logger())
-    { return loop_.logger(); }
+    event_loop& loop_;
 };
 
 }
