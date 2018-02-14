@@ -50,12 +50,12 @@ void poll_poller::poll(int timeout)
         if (it->revents) {
             --nr;
 
-            int ev = it->revents & (POLLIN | POLLOUT | POLLERR | POLLHUP);
-
             if (it->revents & POLLNVAL)
-                ev |= ev_err;
-
-            loop_.feed_event(it->fd, ev);
+                loop_.fd_kill(it->fd);
+            else {
+                int ev = it->revents & (POLLIN | POLLOUT | POLLERR | POLLHUP);
+                loop_.fd_event(it->fd, ev);
+            }
         }
 }
 

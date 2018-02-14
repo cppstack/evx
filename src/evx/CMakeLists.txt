@@ -1,5 +1,7 @@
 add_library(evx
             core/event_loop.cpp
+            core/watcher.cpp
+            core/watchers/io_watcher.cpp
             core/poller.cpp
             core/pollers/poll_poller.cpp
             )

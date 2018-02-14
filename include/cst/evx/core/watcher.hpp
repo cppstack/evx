@@ -36,45 +36,40 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const watcher& w);
 
-    typedef std::function<void(int)> handler_t;
+    typedef std::function<void(watcher&, int)> handler_t;
 
-    watcher(event_loop& loop, enum watch_t type,
-            const handler_t& handler = nullptr) noexcept
-        : loop_(loop), type_(type), handler_(handler)
+    watcher(const watcher&) = delete;
+    watcher& operator=(const watcher&) = delete;
+
+    watcher(event_loop& loop, watch_t type, int events, const handler_t& handler) noexcept
+        : loop_(loop), type_(type), events_(filter(events)), handler_(handler)
     { }
 
     int fd() const noexcept
     { return fd_; }
 
+    void enable_events(int ev) noexcept;
+    void disable_events(int ev) noexcept;
+
+private:
+    static int filter(int ev) noexcept
+    { return ev & (ev_in | ev_out); }
+
     bool pending() const noexcept
     { return pending_; }
 
-    int events() const noexcept
-    { return events_; }
-
-    int revents() const noexcept
-    { return revents_; }
-
-private:
-    void pending(bool p) noexcept
-    { pending_ = p; }
-
-    int& revents() noexcept
-    { return revents_; }
-
     void handle()
-    { handler_(revents_); }
+    { handler_(*this, revents_); }
 
+protected:
     event_loop& loop_;
-    enum watch_t type_;
-    handler_t handler_;
+    watch_t type_;
     int fd_ = -1;
     bool pending_ = false;
     int events_ = ev_none;
     int revents_ = ev_none;
+    handler_t handler_;
 };
-
-using watcher_ptr = std::shared_ptr<watcher>;
 
 inline std::ostream& operator<<(std::ostream& os, const watcher& w)
 {

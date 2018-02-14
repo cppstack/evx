@@ -28,16 +28,25 @@ public:
     const logger_ptr& logger() const noexcept
     { return logger_; }
 
-    void add_watcher(const watcher_ptr& w);
-    void del_watcher(const watcher_ptr& w);
+    void add_watcher(watcher* w);
+    void del_watcher(watcher* w);
 
-    void feed_event(int fd, int revents);
+    void fd_change(int fd)
+    { changed_fds_.insert(fd); }
+
+    void fd_kill(int fd);
+
+    void fd_event(int fd, int revents);
+
+    void feed_event(watcher* w, int revents);
 
     void run();
 
     ~event_loop();
 
 private:
+    void fd_sync_();
+
     void invoke_pendings_();
 
     static logger_ptr default_logger_;
@@ -47,9 +56,15 @@ private:
     logger_ptr logger_;
     std::unique_ptr<poller> poller_;
 
-    std::map<int, std::set<watcher_ptr>> watchers_;
+    struct fd_watch {
+        int events = ev_none;
+        std::set<watcher*> watchers;
+    };
 
-    std::list<watcher_ptr> pendings_;
+    std::map<int, fd_watch> watchers_;
+    std::set<int> changed_fds_;
+
+    std::list<watcher*> pendings_;
 };
 
 }
