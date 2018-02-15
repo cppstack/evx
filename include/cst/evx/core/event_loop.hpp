@@ -13,6 +13,10 @@ namespace evx {
 class poller;
 
 class event_loop {
+    friend class watcher;
+    friend class io_watcher;
+    friend class poll_poller;
+
 public:
     event_loop(const event_loop&) = delete;
     event_loop& operator=(const event_loop&) = delete;
@@ -28,6 +32,11 @@ public:
     const logger_ptr& logger() const noexcept
     { return logger_; }
 
+    void run();
+
+    ~event_loop();
+
+private: /* may used by friends */
     void add_watcher(watcher* w);
     void del_watcher(watcher* w);
 
@@ -40,11 +49,7 @@ public:
 
     void feed_event(watcher* w, int revents);
 
-    void run();
-
-    ~event_loop();
-
-private:
+private: /* internal used */
     void fd_sync_();
 
     void invoke_pendings_();

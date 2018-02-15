@@ -36,7 +36,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const watcher& w);
 
-    typedef std::function<void(watcher&, int)> handler_t;
+    typedef std::function<void(int)> handler_t;
 
     watcher(const watcher&) = delete;
     watcher& operator=(const watcher&) = delete;
@@ -45,6 +45,7 @@ public:
         : loop_(loop), type_(type), events_(filter(events)), handler_(handler)
     { }
 
+protected:
     int fd() const noexcept
     { return fd_; }
 
@@ -59,12 +60,14 @@ private:
     { return pending_; }
 
     void handle()
-    { handler_(*this, revents_); }
+    { handler_(revents_); }
 
 protected:
     event_loop& loop_;
     watch_t type_;
     int fd_ = -1;
+
+private:
     bool pending_ = false;
     int events_ = ev_none;
     int revents_ = ev_none;

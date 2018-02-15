@@ -1,2 +1,2 @@
 # evx
-An event loop library using reactor pattern for Linux.
+An event loop library especially for Linux

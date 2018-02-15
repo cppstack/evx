@@ -3,7 +3,7 @@
 
 namespace evx = cst::evx;
 
-void stdin_handler(evx::watcher& w, int revents)
+void stdin_handler(evx::io_watcher& w, int revents)
 {
     char buf[32];
 
@@ -12,7 +12,7 @@ void stdin_handler(evx::watcher& w, int revents)
         if (n > 0)
             ::write(STDOUT_FILENO, buf, n);
         else
-            w.disable_events(evx::ev_in);
+            w.disable_read();
     }
 }
 
