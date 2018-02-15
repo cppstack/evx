@@ -15,6 +15,7 @@ class poller;
 class event_loop {
     friend class watcher;
     friend class io_watcher;
+    friend class timer_watcher;
     friend class poll_poller;
 
 public:

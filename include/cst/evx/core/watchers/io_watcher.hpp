@@ -8,12 +8,15 @@ namespace evx {
 
 class io_watcher : private watcher {
 public:
-    typedef std::function<void(io_watcher&, int)> io_handler_t;
+    typedef std::function<void(io_watcher&)> io_handler_t;
 
     io_watcher(event_loop& loop, int fd, int events, const io_handler_t& handler);
 
     int fd() const noexcept
     { return watcher::fd(); }
+
+    int revents() const noexcept
+    { return watcher::revents(); }
 
     void enable_read() noexcept
     { enable_events(ev_in); }

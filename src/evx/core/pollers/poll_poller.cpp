@@ -1,7 +1,5 @@
-#include <cst/evx/core/event_loop.hpp>
 #include "evx/core/pollers/poll_poller.hpp"
 #include "evx/core/errors.hpp"
-#include <poll.h>
 
 namespace cst {
 namespace evx {

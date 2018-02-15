@@ -2,11 +2,10 @@
 #define _CST_EVX_POLL_POLLER_HPP
 
 #include "evx/core/poller.hpp"
+#include <poll.h>
 
 #include <vector>
 #include <map>
-
-struct pollfd;
 
 namespace cst {
 namespace evx {
@@ -19,7 +18,7 @@ public:
     void poll(int timeout) override;
 
 private:
-    std::vector<pollfd> pollfds_;
+    std::vector<struct ::pollfd> pollfds_;
     std::map<int, unsigned> pollidxs_;
 };
 
