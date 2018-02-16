@@ -1,9 +1,7 @@
 #ifndef _CST_EVX_WATCHER_HPP
 #define _CST_EVX_WATCHER_HPP
 
-#include <memory>
 #include <ostream>
-#include <functional>
 
 namespace cst {
 namespace evx {
@@ -31,50 +29,39 @@ enum {
 class event_loop;
 
 class watcher {
-public:
     friend event_loop;
-
     friend std::ostream& operator<<(std::ostream& os, const watcher& w);
 
-    typedef std::function<void()> handler_t;
-
+protected:
     watcher(const watcher&) = delete;
     watcher& operator=(const watcher&) = delete;
 
-    watcher(event_loop& loop, watch_t type, int events, const handler_t& handler) noexcept
-        : loop_(loop), type_(type), events_(filter(events)), handler_(handler)
+    watcher(event_loop& loop, watch_t type, int events) noexcept
+        : loop_(loop), type_(type), events_(filter(events))
     { }
 
-protected:
+    static int filter(int ev) noexcept
+    { return ev & (ev_in | ev_out); }
+
     int fd() const noexcept
     { return fd_; }
-
-    int revents() const noexcept
-    { return revents_; }
 
     void enable_events(int ev) noexcept;
     void disable_events(int ev) noexcept;
 
-private:
-    static int filter(int ev) noexcept
-    { return ev & (ev_in | ev_out); }
-
     bool pending() const noexcept
     { return pending_; }
 
-    void handle()
-    { handler_(); }
+    virtual void handle() = 0;
 
-protected:
+    virtual ~watcher() = default;
+
     event_loop& loop_;
-    watch_t type_;
+    const watch_t type_;
     int fd_ = -1;
-
-private:
     bool pending_ = false;
     int events_ = ev_none;
     int revents_ = ev_none;
-    handler_t handler_;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const watcher& w)

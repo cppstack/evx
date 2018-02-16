@@ -1,10 +1,12 @@
 #ifndef _CST_EVX_POLLER_HPP
 #define _CST_EVX_POLLER_HPP
 
-#include <cst/evx/core/event_loop.hpp>
+#include <memory>
 
 namespace cst {
 namespace evx {
+
+class event_loop;
 
 class poller {
 public:
@@ -23,9 +25,6 @@ public:
     virtual ~poller() = default;
 
 protected:
-    const logger_ptr& logger() const noexcept
-    { return loop_.logger(); }
-
     event_loop& loop_;
 };
 

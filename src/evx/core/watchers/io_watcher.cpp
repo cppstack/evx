@@ -6,7 +6,7 @@ namespace evx {
 
 io_watcher::io_watcher(event_loop& loop, int fd, int events,
                        const io_handler_t& handler)
-    : watcher(loop, w_io, events, std::bind(handler, std::ref(*this)))
+    : watcher(loop, w_io, events), handler_(handler)
 {
     fd_ = fd;
     loop_.add_watcher(this);

@@ -1,5 +1,6 @@
+#include <cst/evx/core/event_loop.hpp>
 #include "evx/core/pollers/poll_poller.hpp"
-#include "evx/core/errors.hpp"
+#include "evx/os/poll.hpp"
 
 namespace cst {
 namespace evx {
@@ -40,9 +41,7 @@ void poll_poller::modify(int fd, int nev)
 
 void poll_poller::poll(int timeout)
 {
-    int nr = ::poll(pollfds_.data(), pollfds_.size(), timeout);
-    if (nr == -1)
-        throw_system_error(errno, logger(), "poll()");
+    int nr = os::poll(pollfds_.data(), pollfds_.size(), timeout, loop_.logger());
 
     for (auto it = pollfds_.cbegin(); nr && it != pollfds_.cend(); ++it)
         if (it->revents) {

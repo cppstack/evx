@@ -2,21 +2,22 @@
 #define _CST_EVX_IO_WATCHER_HPP
 
 #include <cst/evx/core/watcher.hpp>
+#include <functional>
 
 namespace cst {
 namespace evx {
 
-class io_watcher : private watcher {
+class io_watcher : public watcher {
 public:
     typedef std::function<void(io_watcher&)> io_handler_t;
 
     io_watcher(event_loop& loop, int fd, int events, const io_handler_t& handler);
 
     int fd() const noexcept
-    { return watcher::fd(); }
+    { return fd_; }
 
     int revents() const noexcept
-    { return watcher::revents(); }
+    { return revents_; }
 
     void enable_read() noexcept
     { enable_events(ev_in); }
@@ -30,7 +31,13 @@ public:
     void disable_write() noexcept
     { disable_events(ev_out); }
 
+    void handle() override
+    { handler_(*this); }
+
     ~io_watcher();
+
+private:
+    const io_handler_t handler_;
 };
 
 }
