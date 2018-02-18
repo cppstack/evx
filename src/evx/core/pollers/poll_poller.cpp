@@ -5,26 +5,27 @@
 namespace cst {
 namespace evx {
 
-void poll_poller::modify(int fd, int nev)
+void poll_poller::modify(int fd, int oev, int nev)
 {
     /* TODO: lock it in multithreading */
 
-    short pev = (short) (nev & (POLLIN | POLLOUT));
+    if (oev == nev && nev)
+        return;
 
     auto it = pollidxs_.find(fd);
 
     if (it == pollidxs_.end()) {
-        if (pev) {
+        if (nev) {
             /* new fd and have events interested */
-            pollfds_.push_back({fd, pev, 0});
+            pollfds_.push_back({fd, (short) nev, 0});
             pollidxs_[fd] = pollfds_.size() - 1;
         }
     } else {
         unsigned idx = it->second;
 
-        if (pev)
+        if (nev)
             /* just update */
-            pollfds_[idx].events = pev;
+            pollfds_[idx].events = nev;
         else {
             /* nev is none, delete fd */
             unsigned last = pollfds_.size() - 1;
@@ -41,7 +42,7 @@ void poll_poller::modify(int fd, int nev)
 
 void poll_poller::poll(int timeout)
 {
-    int nr = os::poll(pollfds_.data(), pollfds_.size(), timeout, loop_.logger());
+    size_t nr = os::poll(pollfds_.data(), pollfds_.size(), timeout, logger_);
 
     for (auto it = pollfds_.cbegin(); nr && it != pollfds_.cend(); ++it)
         if (it->revents) {

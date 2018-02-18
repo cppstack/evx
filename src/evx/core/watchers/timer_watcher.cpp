@@ -10,11 +10,9 @@ timer_watcher::timer_watcher(event_loop& loop,
           const std::chrono::time_point<std::chrono::system_clock>& time_point,
           const std::chrono::nanoseconds& interval,
           const timer_handler_t& handler)
-    : watcher(loop, w_timer, ev_in), handler_(handler)
+    : watcher(loop, w_timer, event_), handler_(handler)
 {
-    const logger_ptr& log = loop_.logger();
-
-    fd_ = os::timerfd_create(CLOCK_REALTIME, 0, log);
+    fd_ = os::timerfd_create(CLOCK_REALTIME, 0, logger_);
 
     const auto tpns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_point.time_since_epoch());
     const auto sc = std::nano::den;
@@ -25,7 +23,7 @@ timer_watcher::timer_watcher(event_loop& loop,
     tspec.it_interval.tv_sec = interval.count() / sc;
     tspec.it_interval.tv_nsec = interval.count() % sc;
 
-    os::timerfd_settime(fd_, TFD_TIMER_ABSTIME, &tspec, nullptr, log);
+    os::timerfd_settime(fd_, TFD_TIMER_ABSTIME, &tspec, nullptr, logger_);
 
     loop_.add_watcher(this);
 }
@@ -34,11 +32,9 @@ timer_watcher::timer_watcher(event_loop& loop,
           const std::chrono::nanoseconds& time,
           const std::chrono::nanoseconds& interval,
           const timer_handler_t& handler)
-    : watcher(loop, w_timer, ev_in), handler_(handler)
+    : watcher(loop, w_timer, event_), handler_(handler)
 {
-    const logger_ptr& log = loop_.logger();
-
-    fd_ = os::timerfd_create(CLOCK_MONOTONIC, 0, log);
+    fd_ = os::timerfd_create(CLOCK_MONOTONIC, 0, logger_);
 
     const auto sc = std::nano::den;
 
@@ -48,24 +44,21 @@ timer_watcher::timer_watcher(event_loop& loop,
     tspec.it_interval.tv_sec = interval.count() / sc;
     tspec.it_interval.tv_nsec = interval.count() % sc;
 
-    os::timerfd_settime(fd_, 0, &tspec, nullptr, log);
+    os::timerfd_settime(fd_, 0, &tspec, nullptr, logger_);
 
     loop_.add_watcher(this);
 }
 
 void timer_watcher::handle()
 {
-    const logger_ptr& log = loop_.logger();
-
     if (revents_ & ev_err) {
-        LOG_ERROR(log) << "timer events error";
+        LOG_ERROR(logger_) << "timer events error";
         disable();
         return;
     }
 
-    /* maybe turn off the read() to save a system call */
     if (::read(fd_, &expirations_, sizeof(uint64_t)) != sizeof(uint64_t)) {
-        LOG_ERROR(log) << "timerfd read error";
+        LOG_ERROR(logger_) << "timerfd read error";
         disable();
         return;
     }

@@ -99,16 +99,15 @@ void event_loop::fd_sync_()
     for (int fd : changed_fds_) {
         auto it = watchers_.find(fd);
         if (it == watchers_.end())
-            poller_->modify(fd, ev_none);
+            /* not found, delete it */
+            poller_->modify(fd, ev_none, ev_none);
         else {
             int n_events = ev_none;
             for (auto& w : it->second.watchers)
                 n_events |= w->events_;
 
-            if (n_events != it->second.events) {
-                it->second.events = n_events;
-                poller_->modify(fd, n_events);
-            }
+            poller_->modify(fd, it->second.events, n_events);
+            it->second.events = n_events;
         }
     }
 

@@ -14,7 +14,7 @@ class poll_poller : public poller {
 public:
     using poller::poller;
 
-    void modify(int fd, int nev) override;
+    void modify(int fd, int oev, int nev) override;
     void poll(int timeout) override;
 
 private:

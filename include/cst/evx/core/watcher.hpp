@@ -1,6 +1,7 @@
 #ifndef _CST_EVX_WATCHER_HPP
 #define _CST_EVX_WATCHER_HPP
 
+#include <cst/evx/core/logger_ptr.hpp>
 #include <ostream>
 
 namespace cst {
@@ -36,9 +37,7 @@ protected:
     watcher(const watcher&) = delete;
     watcher& operator=(const watcher&) = delete;
 
-    watcher(event_loop& loop, watch_t type, int events) noexcept
-        : loop_(loop), type_(type), events_(filter(events))
-    { }
+    watcher(event_loop& loop, watch_t type, int events) noexcept;
 
     static int filter(int ev) noexcept
     { return ev & (ev_in | ev_out); }
@@ -62,6 +61,8 @@ protected:
     bool pending_ = false;
     int events_ = ev_none;
     int revents_ = ev_none;
+
+    const logger_ptr& logger_;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const watcher& w)

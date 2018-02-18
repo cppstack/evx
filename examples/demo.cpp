@@ -13,8 +13,10 @@ void stdin_handler(evx::io_watcher& w)
         int n = ::read(w.fd(), buf, sizeof(buf));
         if (n > 0)
             ::write(STDOUT_FILENO, buf, n);
-        else
+        else {
+            std::cerr << (n == 0 ? "end of file" : "read error") << std::endl;
             w.disable_read();
+        }
     }
 }
 

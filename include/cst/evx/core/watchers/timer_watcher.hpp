@@ -38,10 +38,10 @@ public:
     { return expirations_; }
 
     void enable() noexcept
-    { enable_events(ev_in); }
+    { enable_events(event_); }
 
     void disable() noexcept
-    { disable_events(ev_in); }
+    { disable_events(event_); }
 
     void handle() override;
 
@@ -51,6 +51,8 @@ private:
     uint64_t expirations_ = 0;
 
     const timer_handler_t handler_;
+
+    const int event_ = ev_in;
 };
 
 }

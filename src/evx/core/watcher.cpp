@@ -4,6 +4,10 @@
 namespace cst {
 namespace evx {
 
+watcher::watcher(event_loop& loop, watch_t type, int events) noexcept
+    : loop_(loop), type_(type), events_(filter(events)), logger_(loop.logger())
+{ }
+
 void watcher::enable_events(int ev) noexcept
 {
     ev = filter(ev);

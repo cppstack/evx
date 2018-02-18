@@ -8,7 +8,7 @@ namespace cst {
 namespace evx {
 namespace os {
 
-inline int poll(struct ::pollfd* fds, ::nfds_t nfds, int timeout, const logger_ptr& log)
+inline size_t poll(struct ::pollfd* fds, size_t nfds, int timeout, const logger_ptr& log)
 {
     int nr = ::poll(fds, nfds, timeout);
     if (nr == -1)

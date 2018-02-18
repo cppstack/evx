@@ -1,5 +1,5 @@
-#ifndef _CST_EVX_COMMON_HPP
-#define _CST_EVX_COMMON_HPP
+#ifndef _CST_EVX_LOGGER_PTR_HPP
+#define _CST_EVX_LOGGER_PTR_HPP
 
 #include <memory>
 

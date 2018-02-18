@@ -1,7 +1,6 @@
 #ifndef _CST_EVX_EVENT_LOOP_HPP
 #define _CST_EVX_EVENT_LOOP_HPP
 
-#include <cst/evx/core/common.hpp>
 #include <cst/evx/core/watcher.hpp>
 #include <list>
 #include <map>
@@ -17,6 +16,7 @@ class event_loop {
     friend class io_watcher;
     friend class timer_watcher;
     friend class poll_poller;
+    friend class epoll_poller;
 
 public:
     event_loop(const event_loop&) = delete;
