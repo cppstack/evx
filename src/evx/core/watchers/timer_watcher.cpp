@@ -6,13 +6,15 @@
 namespace cst {
 namespace evx {
 
+using namespace os;
+
 timer_watcher::timer_watcher(event_loop& loop,
           const std::chrono::time_point<std::chrono::system_clock>& time_point,
           const std::chrono::nanoseconds& interval,
           const timer_handler_t& handler)
     : watcher(loop, w_timer, event_), handler_(handler)
 {
-    fd_ = os::timerfd_create(CLOCK_REALTIME, 0, logger_);
+    fd_ = Timerfd_create(CLOCK_REALTIME, 0, logger_);
 
     const auto tpns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_point.time_since_epoch());
     const auto sc = std::nano::den;
@@ -23,7 +25,7 @@ timer_watcher::timer_watcher(event_loop& loop,
     tspec.it_interval.tv_sec = interval.count() / sc;
     tspec.it_interval.tv_nsec = interval.count() % sc;
 
-    os::timerfd_settime(fd_, TFD_TIMER_ABSTIME, &tspec, nullptr, logger_);
+    Timerfd_settime(fd_, TFD_TIMER_ABSTIME, &tspec, nullptr, logger_);
 
     loop_.add_watcher(this);
 }
@@ -34,7 +36,7 @@ timer_watcher::timer_watcher(event_loop& loop,
           const timer_handler_t& handler)
     : watcher(loop, w_timer, event_), handler_(handler)
 {
-    fd_ = os::timerfd_create(CLOCK_MONOTONIC, 0, logger_);
+    fd_ = Timerfd_create(CLOCK_MONOTONIC, 0, logger_);
 
     const auto sc = std::nano::den;
 
@@ -44,7 +46,7 @@ timer_watcher::timer_watcher(event_loop& loop,
     tspec.it_interval.tv_sec = interval.count() / sc;
     tspec.it_interval.tv_nsec = interval.count() % sc;
 
-    os::timerfd_settime(fd_, 0, &tspec, nullptr, logger_);
+    Timerfd_settime(fd_, 0, &tspec, nullptr, logger_);
 
     loop_.add_watcher(this);
 }

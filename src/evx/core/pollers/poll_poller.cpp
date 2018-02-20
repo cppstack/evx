@@ -42,7 +42,7 @@ void poll_poller::modify(int fd, int oev, int nev)
 
 void poll_poller::poll(int timeout)
 {
-    size_t nr = os::poll(pollfds_.data(), pollfds_.size(), timeout, logger_);
+    size_t nr = os::Poll(pollfds_.data(), pollfds_.size(), timeout, logger_);
 
     for (auto it = pollfds_.cbegin(); nr && it != pollfds_.cend(); ++it)
         if (it->revents) {

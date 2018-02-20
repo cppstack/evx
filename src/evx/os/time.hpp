@@ -8,22 +8,23 @@ namespace cst {
 namespace evx {
 namespace os {
 
-inline int timerfd_create(int clockid, int flags, const logger_ptr& log)
+inline int Timerfd_create(int clockid, int flags,
+                          const logger_ptr& log = nullptr)
 {
     int fd = ::timerfd_create(clockid, flags);
     if (fd == -1)
-        throw_system_error(errno, log, "timerfd_create()");
+        throw_system_error(errno, "timerfd_create()", log);
 
     return fd;
 }
 
-inline void timerfd_settime(int fd, int flags,
+inline void Timerfd_settime(int fd, int flags,
                             const struct ::itimerspec* new_value,
                             struct ::itimerspec* old_value,
-                            const logger_ptr& log)
+                            const logger_ptr& log = nullptr)
 {
     if (::timerfd_settime(fd, flags, new_value, old_value) == -1)
-        throw_system_error(errno, log, "timerfd_settime()");
+        throw_system_error(errno, "timerfd_settime()", log);
 }
 
 }

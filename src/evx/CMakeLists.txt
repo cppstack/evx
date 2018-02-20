@@ -6,6 +6,10 @@ add_library(evx
             core/poller.cpp
             core/pollers/poll_poller.cpp
             core/pollers/epoll_poller.cpp
+            os/socket.cpp
+            os/openssl.cpp
+            net/socket_address.cpp
+            net/socket.cpp
             )
 
 configure_file(${PROJECT_SOURCE_DIR}/config.h.in

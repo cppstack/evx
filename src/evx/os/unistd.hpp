@@ -8,11 +8,11 @@ namespace cst {
 namespace evx {
 namespace os {
 
-inline size_t read(int fd, void* buf, size_t len, const logger_ptr& log)
+inline size_t Read(int fd, void* buf, size_t len, const logger_ptr& log = nullptr)
 {
     ssize_t n = ::read(fd, buf, len);
     if (n == -1)
-        throw_system_error(errno, log, "read()");
+        throw_system_error(errno, "read()", log);
 
     return n;
 }

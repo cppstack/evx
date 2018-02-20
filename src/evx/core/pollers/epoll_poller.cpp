@@ -5,9 +5,11 @@
 namespace cst {
 namespace evx {
 
+using namespace os;
+
 epoll_poller::epoll_poller(event_loop& loop)
     : poller(loop),
-      epfd_(os::epoll_create1(0, logger_)),
+      epfd_(Epoll_create1(0, logger_)),
       events_(64)
 { }
 
@@ -19,7 +21,7 @@ void epoll_poller::modify(int fd, int oev, int nev)
         return;
 
     if (!nev) {
-        int err = os::epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, nullptr, logger_);
+        int err = Epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, nullptr, logger_);
         if (err == EPERM) {
             if (!eperm_fds_.erase(fd))
                 LOG_ERROR(logger_) << "eperm_fd(" << fd << ") not found";
@@ -30,13 +32,13 @@ void epoll_poller::modify(int fd, int oev, int nev)
         event.data.fd = fd;
 
         if (!oev) {
-            int err = os::epoll_ctl(epfd_, EPOLL_CTL_ADD, fd, &event, logger_);
+            int err = Epoll_ctl(epfd_, EPOLL_CTL_ADD, fd, &event, logger_);
             if (err == EPERM) {
                 LOG_NOTICE(logger_) << "epoll_ctl() EPERM, fd: " << fd;
                 eperm_fds_.insert(fd);
             }
         } else {
-            int err = os::epoll_ctl(epfd_, EPOLL_CTL_MOD, fd, &event, logger_);
+            int err = Epoll_ctl(epfd_, EPOLL_CTL_MOD, fd, &event, logger_);
             if (err == EPERM) {
                 if (!eperm_fds_.count(fd))
                     LOG_ERROR(logger_) << "eperm_fd(" << fd << ") not found";
@@ -54,7 +56,7 @@ void epoll_poller::poll(int timeout)
         timeout = 0;
     }
 
-    size_t nr = os::epoll_wait(epfd_, events_.data(), events_.size(), timeout, logger_);
+    size_t nr = Epoll_wait(epfd_, events_.data(), events_.size(), timeout, logger_);
 
     for (size_t i = 0; i < nr; ++i) {
         int ev = events_[i].events & (EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP);
