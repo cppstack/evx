@@ -1,6 +1,6 @@
 #include <cst/evx/core/event_loop.hpp>
-#include "evx/core/pollers/poll_poller.hpp"
-#include "evx/os/poll.hpp"
+#include "core/pollers/poll_poller.hpp"
+#include "os/poll.hpp"
 
 namespace cst {
 namespace evx {

@@ -1,7 +1,7 @@
 #ifndef _CST_EVX_OS_OPENSSL_HPP
 #define _CST_EVX_OS_OPENSSL_HPP
 
-#include "evx/core/errors.hpp"
+#include "core/errors.hpp"
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <stdexcept>

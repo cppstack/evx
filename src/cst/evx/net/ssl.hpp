@@ -1,7 +1,7 @@
 #ifndef _CST_EVX_NET_SSL_HPP
 #define _CST_EVX_NET_SSL_HPP
 
-#include "evx/net/ssl_ctx.hpp"
+#include "net/ssl_ctx.hpp"
 
 namespace cst {
 namespace evx {

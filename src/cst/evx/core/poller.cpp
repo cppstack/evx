@@ -1,8 +1,8 @@
 #include <cst/evx/core/event_loop.hpp>
-#include "evx/core/poller.hpp"
-#include "evx/core/pollers/poll_poller.hpp"
-#include "evx/core/pollers/epoll_poller.hpp"
-#include "evx/config.h"
+#include "core/poller.hpp"
+#include "core/pollers/poll_poller.hpp"
+#include "core/pollers/epoll_poller.hpp"
+#include "config.h"
 
 namespace cst {
 namespace evx {

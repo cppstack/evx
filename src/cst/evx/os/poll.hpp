@@ -1,7 +1,7 @@
 #ifndef _CST_EVX_OS_POLL_HPP
 #define _CST_EVX_OS_POLL_HPP
 
-#include "evx/core/errors.hpp"
+#include "core/errors.hpp"
 #include <poll.h>
 
 namespace cst {

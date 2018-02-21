@@ -1,7 +1,7 @@
 #ifndef _CST_EVX_OS_SOCKET_HPP
 #define _CST_EVX_OS_SOCKET_HPP
 
-#include "evx/core/errors.hpp"
+#include "core/errors.hpp"
 #include <sys/socket.h>
 #include <cstring>
 

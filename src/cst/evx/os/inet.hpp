@@ -1,7 +1,7 @@
 #ifndef _CST_EVX_OS_INET_HPP
 #define _CST_EVX_OS_INET_HPP
 
-#include "evx/core/errors.hpp"
+#include "core/errors.hpp"
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <cstring>

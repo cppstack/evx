@@ -2,10 +2,10 @@
 #define _CST_EVX_NET_SOCKET_HPP
 
 #include <cst/evx/net/socket_address.hpp>
-#include "evx/core/file_descriptor.hpp"
-#include "evx/net/ssl.hpp"
-#include "evx/os/socket.hpp"
-#include "evx/os/inet.hpp"
+#include "core/file_descriptor.hpp"
+#include "net/ssl.hpp"
+#include "os/socket.hpp"
+#include "os/inet.hpp"
 #include <memory>
 
 namespace cst {
@@ -56,6 +56,9 @@ public:
 
         return tcp_connect(host, std::to_string(port));
     }
+
+    int fd() const noexcept
+    { return fd_; }
 
     void connect(const std::string& host, uint16_t port);
 
