@@ -39,6 +39,19 @@ socket_address::socket_address(const std::string& ip, uint16_t port, int af)
     throw socket_address_error(ip, port, af);
 }
 
+std::ostream& operator<<(std::ostream& os, const socket_address& addr)
+{
+    int af = addr.storage_.ss_family;
+
+    if (af == AF_INET || af == AF_INET6) {
+        char buf[INET6_ADDRSTRLEN + 1];
+        Inet_ntop(af, addr.sin_addr(af), buf, sizeof(buf));
+        os << buf << ':' << ntohs(addr.sin_port(af));
+    }
+
+    return os;
+}
+
 }
 }
 }

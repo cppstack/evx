@@ -17,6 +17,8 @@ using sockaddr_storage = struct sockaddr_storage;
 using socklen_t        = ::socklen_t;
 
 class socket_address {
+    friend std::ostream& operator<<(std::ostream&, const socket_address&);
+
 public:
     socket_address() noexcept
     { std::memset(&storage_, 0, sizeof(storage_)); }
@@ -46,7 +48,7 @@ public:
     { return &len_; }
 
 private:
-    void* sin_addr(int af) noexcept
+    const void* sin_addr(int af) const noexcept
     {
         /* af must be either AF_INET or AF_INET6 */
         if (af == AF_INET)
@@ -55,7 +57,14 @@ private:
             return &((sockaddr_in6*) &storage_)->sin6_addr;
     }
 
-    uint16_t& sin_port(int af) noexcept
+    void* sin_addr(int af) noexcept
+    {
+        return const_cast<void*>(
+              static_cast<const socket_address*>(this)->sin_addr(af)
+        );
+    }
+
+    const uint16_t& sin_port(int af) const noexcept
     {
         /* af must be either AF_INET or AF_INET6 */
         return (af == AF_INET) ?
@@ -63,8 +72,15 @@ private:
              : ((sockaddr_in6*) &storage_)->sin6_port;
     }
 
+    uint16_t& sin_port(int af) noexcept
+    {
+        return const_cast<uint16_t&>(
+              static_cast<const socket_address&>(*this).sin_port(af)
+        );
+    }
+
     sockaddr_storage storage_;
-    socklen_t len_ = 0;
+    socklen_t len_ = sizeof(storage_);
 };
 
 class socket_address_error : public std::logic_error {

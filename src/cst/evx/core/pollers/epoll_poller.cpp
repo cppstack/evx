@@ -17,14 +17,19 @@ void epoll_poller::modify(int fd, int oev, int nev)
 {
     /* TODO: lock it in multithreading */
 
-    if (oev == nev && nev)
-        return;
+    LOG_DEBUG_F(logger_, "epoller::modify(%d, %d, %d)", fd, oev, nev);
 
     if (!nev) {
-        int err = Epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, nullptr, logger_);
-        if (err == EPERM) {
-            if (!eperm_fds_.erase(fd))
-                LOG_ERROR(logger_) << "eperm_fd(" << fd << ") not found";
+        if (!oev) {
+            /* it was already gone, and we want it go again, which means
+             * we really need to delete it.
+             * this only happens when we got events from a non-interested fd
+             */
+            int err = Epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, nullptr, logger_);
+            if (err == EPERM) {
+                if (!eperm_fds_.erase(fd))
+                    LOG_ERROR(logger_) << "eperm_fd(" << fd << ") not found";
+            }
         }
     } else {
         struct ::epoll_event event;

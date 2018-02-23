@@ -3,7 +3,6 @@
 
 #include <cst/evx/core/watchers/io_watcher.hpp>
 #include "net/socket.hpp"
-#include <functional>
 
 namespace cst {
 namespace evx {
@@ -11,6 +10,9 @@ namespace net {
 
 class acceptor {
 public:
+    acceptor(const acceptor&) = delete;
+    acceptor& operator=(const acceptor&) = delete;
+
     typedef std::function<void(socket&&, const socket_address&)> accept_cb_t;
 
     acceptor(event_loop& loop, const socket_address& addr, const accept_cb_t& cb)
@@ -20,7 +22,7 @@ public:
           accept_cb_(cb)
     { }
 
-    void listen(size_t backlog)
+    void listen(size_t backlog = SOMAXCONN)
     { sock_.listen(backlog); }
 
 private:

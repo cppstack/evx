@@ -5,3 +5,5 @@ macro(_add_example name)
 endmacro()
 
 _add_example(demo)
+
+add_subdirectory(net)

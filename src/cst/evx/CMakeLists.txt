@@ -1,3 +1,5 @@
+find_package(OpenSSL REQUIRED)
+
 add_library(cst_evx
             core/event_loop.cpp
             core/watcher.cpp
@@ -11,6 +13,9 @@ add_library(cst_evx
             net/socket_address.cpp
             net/socket.cpp
             net/acceptor.cpp
+            net/connector.cpp
+            net/tcp_connection.cpp
+            net/tcp_client.cpp
             net/tcp_server.cpp
             )
 
@@ -23,4 +28,5 @@ target_include_directories(cst_evx PUBLIC  ${PROJECT_SOURCE_DIR}/include
                                    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
                                    PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-target_link_libraries(cst_evx PRIVATE logging)
+target_link_libraries(cst_evx PUBLIC  logging
+                              PRIVATE ${OPENSSL_LIBRARIES})

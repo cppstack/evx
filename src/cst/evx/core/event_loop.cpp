@@ -25,7 +25,8 @@ void event_loop::add_watcher(watcher* w)
     if (!watchers_[w->fd()].watchers.insert(w).second)
         LOG_ERROR(logger_) << *w << " already in loop";
 
-    fd_change(w->fd());
+    if (w->events_)
+        fd_change(w->fd());
 }
 
 void event_loop::del_watcher(watcher* w)
@@ -47,7 +48,8 @@ void event_loop::del_watcher(watcher* w)
     if (set.empty())
         watchers_.erase(it1);
 
-    fd_change(w->fd());
+    if (w->events_)
+        fd_change(w->fd());
 }
 
 void event_loop::fd_kill(int fd)
@@ -65,6 +67,20 @@ void event_loop::fd_event(int fd, int revents)
     auto it = watchers_.find(fd);
     if (it == watchers_.end()) {
         LOG_ERROR(logger_) << "descriptor " << fd << " not found in loop";
+        return;
+    }
+
+    LOG_DEBUG_F(logger_, "fd_event(%d, %d)", fd, revents);
+
+    int iev = it->second.events;
+    int rev = revents & ~ev_hup & ~ev_err;
+    if (iev == ev_none || (rev && !(iev & rev))) {
+        /* if we're not interested in any events but we still got events,
+         * (which means the fd is still open), we need to del it in poller.
+         * if we got events which we are not interested in, we need to update
+         * the poller again, the later case shouldn't happen.
+         */
+        poller_->modify(fd, iev, iev);
         return;
     }
 
@@ -99,15 +115,17 @@ void event_loop::fd_sync_()
     for (int fd : changed_fds_) {
         auto it = watchers_.find(fd);
         if (it == watchers_.end())
-            /* not found, delete it */
-            poller_->modify(fd, ev_none, ev_none);
+            /* not found, want to delete it */
+            poller_->modify(fd, -1, ev_none);
         else {
             int n_events = ev_none;
             for (auto& w : it->second.watchers)
                 n_events |= w->events_;
 
-            poller_->modify(fd, it->second.events, n_events);
-            it->second.events = n_events;
+            if (it->second.events != n_events) {
+                poller_->modify(fd, it->second.events, n_events);
+                it->second.events = n_events;
+            }
         }
     }
 

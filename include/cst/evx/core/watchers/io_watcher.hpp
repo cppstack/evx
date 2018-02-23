@@ -19,17 +19,23 @@ public:
     int revents() const noexcept
     { return revents_; }
 
-    void enable_read() noexcept
+    void enable_read()
     { enable_events(ev_in); }
 
-    void enable_write() noexcept
+    void enable_write()
     { enable_events(ev_out); }
 
-    void disable_read() noexcept
+    void enable_rdwr()
+    { enable_events(ev_in | ev_out); }
+
+    void disable_read()
     { disable_events(ev_in); }
 
-    void disable_write() noexcept
+    void disable_write()
     { disable_events(ev_out); }
+
+    void disable_rdwr()
+    { disable_events(ev_in | ev_out); }
 
     void handle() override
     { handler_(*this); }

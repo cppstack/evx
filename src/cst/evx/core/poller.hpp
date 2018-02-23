@@ -17,6 +17,12 @@ public:
 
     explicit poller(event_loop& loop) noexcept;
 
+    /*
+     * nev == ev_none means we want to del it, but not necessarily do it
+     * if it's epoll, which needs to check oev further.
+     * oev == ev_none means it was already gone
+     * oev == -1      means we didn't find the watcher
+     */
     virtual void modify(int fd, int oev, int nev) = 0;
     virtual void poll(int timeout) = 0;
 

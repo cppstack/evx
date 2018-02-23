@@ -5,12 +5,9 @@
 namespace cst {
 namespace evx {
 
-void poll_poller::modify(int fd, int oev, int nev)
+void poll_poller::modify(int fd, int /*oev*/, int nev)
 {
     /* TODO: lock it in multithreading */
-
-    if (oev == nev && nev)
-        return;
 
     auto it = pollidxs_.find(fd);
 

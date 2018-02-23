@@ -73,13 +73,11 @@ socket socket::tcp_connect(const std::string& host, const std::string& serv)
     throw std::runtime_error(oss.str());
 }
 
-void socket::connect(const std::string& host, uint16_t port)
+int socket::connect(const std::string& host, uint16_t port)
 {
     try {
         /* try if host is an ip address */
-        socket_address addr(host, port, family_);
-        connect(addr);
-        return;
+        return connect(socket_address(host, port, family_));
     } catch (const socket_address_error&) { }
 
     {
@@ -93,8 +91,7 @@ void socket::connect(const std::string& host, uint16_t port)
 
         for (const addrinfo* rp = res.get(); rp != nullptr; rp = rp->ai_next) {
             try {
-                connect(rp->ai_addr, rp->ai_addrlen);
-                return;
+                return connect(rp->ai_addr, rp->ai_addrlen);
             } catch (const std::system_error&) { }
 
             reinit();

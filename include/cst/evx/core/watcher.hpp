@@ -45,8 +45,8 @@ protected:
     int fd() const noexcept
     { return fd_; }
 
-    void enable_events(int ev) noexcept;
-    void disable_events(int ev) noexcept;
+    void enable_events(int ev);
+    void disable_events(int ev);
 
     bool pending() const noexcept
     { return pending_; }

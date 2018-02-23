@@ -20,10 +20,16 @@ inline int Socket(int domain, int type, int protocol)
     return sockfd;
 }
 
-inline void Connect(int sockfd, const sockaddr* addr, socklen_t addrlen)
+inline int Connect(int sockfd, const sockaddr* addr, socklen_t addrlen,
+                   const logger_ptr& log = nullptr)
 {
-    if (::connect(sockfd, addr, addrlen) == -1)
-        throw_system_error(errno, "connect()");
+    if (::connect(sockfd, addr, addrlen) == 0)
+        return 0;
+
+    if (errno == EINPROGRESS)
+        return errno;
+
+    throw_system_error(errno, "connect()", log);
 }
 
 inline void Bind(int sockfd, const sockaddr* addr, socklen_t addrlen)

@@ -60,16 +60,16 @@ public:
     int fd() const noexcept
     { return fd_; }
 
-    void connect(const std::string& host, uint16_t port);
+    int connect(const std::string& host, uint16_t port);
 
-    void connect(const socket_address& address)
+    int connect(const socket_address& address)
     {
-        os::Connect(fd_, address.addr(), address.len());
+        return os::Connect(fd_, address.addr(), address.len());
     }
 
-    void connect(const sockaddr* addr, socklen_t len)
+    int connect(const sockaddr* addr, socklen_t len)
     {
-        os::Connect(fd_, addr, len);
+        return os::Connect(fd_, addr, len);
     }
 
     void ssl_connect()

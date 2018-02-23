@@ -8,7 +8,7 @@ watcher::watcher(event_loop& loop, watch_t type, int events) noexcept
     : loop_(loop), type_(type), events_(filter(events)), logger_(loop.logger())
 { }
 
-void watcher::enable_events(int ev) noexcept
+void watcher::enable_events(int ev)
 {
     ev = filter(ev);
     if ((events_ & ev) != ev) {
@@ -17,7 +17,7 @@ void watcher::enable_events(int ev) noexcept
     }
 }
 
-void watcher::disable_events(int ev) noexcept
+void watcher::disable_events(int ev)
 {
     ev = filter(ev);
     if ((events_ & ev)) {
