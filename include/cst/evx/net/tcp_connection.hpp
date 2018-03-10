@@ -12,14 +12,20 @@ class socket;
 class tcp_connection;
 using tcp_connection_ptr = std::shared_ptr<tcp_connection>;
 
+typedef std::function<void(const tcp_connection_ptr&)> connect_cb_t;
+typedef std::function<void(const tcp_connection_ptr&)> close_cb_t;
+
 class tcp_connection : public std::enable_shared_from_this<tcp_connection> {
 public:
     tcp_connection(const tcp_connection&) = delete;
     tcp_connection& operator=(const tcp_connection&) = delete;
 
-    typedef std::function<void(const tcp_connection_ptr&)> close_cb_t;
-
     tcp_connection(event_loop& loop, socket&& sock);
+
+    void established();
+
+    void set_connect_callback(const connect_cb_t& cb)
+    { connect_cb_ = cb; }
 
     void set_close_callback(const close_cb_t& cb)
     { close_cb_ = cb; }
@@ -31,6 +37,7 @@ private:
 
     std::unique_ptr<socket> sock_;
     io_watcher iow_;
+    connect_cb_t connect_cb_;
     close_cb_t close_cb_;
 };
 

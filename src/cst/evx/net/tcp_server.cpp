@@ -12,6 +12,9 @@ tcp_server::tcp_server(event_loop& loop, const socket_address& addr)
           std::bind(&tcp_server::new_connection_, this,
                     std::placeholders::_1, std::placeholders::_2))),
       logger_(loop.logger())
+{ }
+
+void tcp_server::start()
 {
     acceptor_->listen();
 }
@@ -23,8 +26,11 @@ void tcp_server::new_connection_(socket&& sock, const socket_address& peer)
 
     LOG_INFO(logger_) << "new tcp connection, remote address: " << peer;
 
+    conn->set_connect_callback(connect_cb_);
     conn->set_close_callback(
           std::bind(&tcp_server::end_connection_, this, std::placeholders::_1));
+
+    conn->established();
 
     connections_.insert(conn);
 }

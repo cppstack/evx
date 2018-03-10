@@ -17,13 +17,16 @@ public:
 
     acceptor(event_loop& loop, const socket_address& addr, const accept_cb_t& cb)
         : sock_(socket::tcp_bind(addr)),
-          iow_(loop, sock_.fd(), ev_in,
+          iow_(loop, sock_.fd(), ev_none,
                std::bind(&acceptor::io_handler_, this, std::placeholders::_1)),
           accept_cb_(cb)
     { }
 
     void listen(size_t backlog = SOMAXCONN)
-    { sock_.listen(backlog); }
+    {
+        iow_.enable_read();
+        sock_.listen(backlog);
+    }
 
 private:
     void io_handler_(io_watcher&);

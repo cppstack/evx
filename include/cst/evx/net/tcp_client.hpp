@@ -18,6 +18,12 @@ public:
     tcp_client& operator=(const tcp_client&) = delete;
 
     tcp_client(event_loop& loop, const socket_address& addr);
+
+    void connect();
+
+    void set_connect_callback(const connect_cb_t& cb)
+    { connect_cb_ = cb; }
+
     ~tcp_client();
 
 private:
@@ -27,6 +33,7 @@ private:
     event_loop& loop_;
     std::unique_ptr<connector> connector_;
     tcp_connection_ptr connection_;
+    connect_cb_t connect_cb_;
     const logger_ptr& logger_;
 };
 

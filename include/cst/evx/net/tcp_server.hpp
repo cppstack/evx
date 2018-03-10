@@ -19,6 +19,12 @@ public:
     tcp_server& operator=(const tcp_server&) = delete;
 
     tcp_server(event_loop& loop, const socket_address& addr);
+
+    void start();
+
+    void set_connect_callback(const connect_cb_t& cb)
+    { connect_cb_ = cb; }
+
     ~tcp_server();
 
 private:
@@ -28,6 +34,7 @@ private:
     event_loop& loop_;
     std::unique_ptr<acceptor> acceptor_;
     std::set<tcp_connection_ptr> connections_;
+    connect_cb_t connect_cb_;
     const logger_ptr& logger_;
 };
 

@@ -11,6 +11,12 @@ tcp_connection::tcp_connection(event_loop& loop, socket&& sock)
            std::bind(&tcp_connection::io_handler_, this, std::placeholders::_1))
 { }
 
+void tcp_connection::established()
+{
+    if (connect_cb_)
+        connect_cb_(shared_from_this());
+}
+
 void tcp_connection::io_handler_(io_watcher& /*iow*/)
 {
     /* TODO: check iow events, error handling */
