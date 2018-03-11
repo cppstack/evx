@@ -18,7 +18,7 @@ public:
 
     ssl(ssl&& that) noexcept
         : ssl_(std::move(that.ssl_)),
-          state_(std::exchange(that.state_, shutdown_))
+          state_(std::exchange(that.state_, disconnected_))
     { }
 
     ssl& operator=(ssl&& that) noexcept
@@ -27,7 +27,7 @@ public:
             shutdown();
 
             ssl_ = std::move(that.ssl_);
-            state_ = std::exchange(that.state_, shutdown_);
+            state_ = std::exchange(that.state_, disconnected_);
         }
 
         return *this;
@@ -49,18 +49,18 @@ public:
     {
         if (state_ == connected_) {
             os::SSL_Shutdown(ssl_.get());
-            state_ = shutdown_;
+            state_ = disconnected_;
         }
     }
 
     ~ssl() { shutdown(); }
 
 private:
-    enum state { init_, connected_, shutdown_ };
+    enum state { disconnected_, connected_ };
 
     std::unique_ptr<SSL, void(*)(SSL*)> ssl_{nullptr, ::SSL_free};
 
-    enum state state_ = init_;
+    enum state state_ = disconnected_;
 };
 
 }

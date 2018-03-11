@@ -19,6 +19,12 @@ public:
     int revents() const noexcept
     { return revents_; }
 
+    bool is_reading() const noexcept
+    { return events_ & ev_in; }
+
+    bool is_writing() const noexcept
+    { return events_ & ev_out; }
+
     void enable_read()
     { enable_events(ev_in); }
 

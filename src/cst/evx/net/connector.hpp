@@ -18,7 +18,8 @@ public:
     connector(event_loop& loop, const socket_address& addr,
               const connect_cb_t& cb);
 
-    void connect();
+    void start();
+    void cancel();
 
     std::string remote_address_str() const;
 

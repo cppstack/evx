@@ -19,21 +19,27 @@ public:
 
     tcp_client(event_loop& loop, const socket_address& addr);
 
-    void connect();
-
     void set_connect_callback(const connect_cb_t& cb)
     { connect_cb_ = cb; }
+
+    void set_write_callback(const write_cb_t& cb)
+    { write_cb_ = cb; }
+
+    void connect();
+
+    void disconnect();
 
     ~tcp_client();
 
 private:
-    void on_connected_(socket&&);
-    void on_closed_();
+    void new_connection_(socket&&);
+    void end_connection_(const tcp_connection_ptr&);
 
     event_loop& loop_;
     std::unique_ptr<connector> connector_;
     tcp_connection_ptr connection_;
     connect_cb_t connect_cb_;
+    write_cb_t write_cb_;
     const logger_ptr& logger_;
 };
 

@@ -183,6 +183,12 @@ public:
         fd_.reset(os::Socket(family_, type_, proto_));
     }
 
+    void shutdown(int how) noexcept
+    {
+        // ssl_.shutdown();
+        ::shutdown(fd_, how);
+    }
+
     void close() noexcept
     {
         ssl_.shutdown();

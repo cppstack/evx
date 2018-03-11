@@ -16,7 +16,7 @@ connector::connector(event_loop& loop, const socket_address& addr,
       logger_(loop.logger())
 { }
 
-void connector::connect()
+void connector::start()
 {
     iow_.enable_rdwr();
 
@@ -24,6 +24,12 @@ void connector::connect()
         ;
     else
         sock_.connect(addr_);
+}
+
+void connector::cancel()
+{
+    iow_.disable_rdwr();
+    sock_.close();
 }
 
 std::string connector::remote_address_str() const

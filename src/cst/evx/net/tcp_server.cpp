@@ -27,6 +27,7 @@ void tcp_server::new_connection_(socket&& sock, const socket_address& peer)
     LOG_INFO(logger_) << "new tcp connection, remote address: " << peer;
 
     conn->set_connect_callback(connect_cb_);
+    conn->set_write_callback(write_cb_);
     conn->set_close_callback(
           std::bind(&tcp_server::end_connection_, this, std::placeholders::_1));
 
@@ -38,6 +39,8 @@ void tcp_server::new_connection_(socket&& sock, const socket_address& peer)
 void tcp_server::end_connection_(const tcp_connection_ptr& conn)
 {
     LOG_INFO(logger_) << "end tcp connection";
+
+    conn->destroy();
 
     connections_.erase(conn);
 }

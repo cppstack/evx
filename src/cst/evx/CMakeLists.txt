@@ -8,6 +8,7 @@ add_library(cst_evx
             core/poller.cpp
             core/pollers/poll_poller.cpp
             core/pollers/epoll_poller.cpp
+            core/buffer.cpp
             os/socket.cpp
             os/openssl.cpp
             net/socket_address.cpp

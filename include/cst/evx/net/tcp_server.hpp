@@ -25,6 +25,9 @@ public:
     void set_connect_callback(const connect_cb_t& cb)
     { connect_cb_ = cb; }
 
+    void set_write_callback(const write_cb_t& cb)
+    { write_cb_ = cb; }
+
     ~tcp_server();
 
 private:
@@ -35,6 +38,7 @@ private:
     std::unique_ptr<acceptor> acceptor_;
     std::set<tcp_connection_ptr> connections_;
     connect_cb_t connect_cb_;
+    write_cb_t write_cb_;
     const logger_ptr& logger_;
 };
 
