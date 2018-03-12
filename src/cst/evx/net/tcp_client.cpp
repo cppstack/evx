@@ -30,6 +30,7 @@ void tcp_client::new_connection_(socket&& sock)
     connection_ = std::make_shared<tcp_connection>(loop_, std::move(sock));
 
     connection_->set_connect_callback(connect_cb_);
+    connection_->set_read_callback(read_cb_);
     connection_->set_write_callback(write_cb_);
     connection_->set_close_callback(
         std::bind(&tcp_client::end_connection_, this, std::placeholders::_1));

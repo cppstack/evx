@@ -71,7 +71,12 @@ void tcp_connection::io_handler_(io_watcher& iow)
 
 void tcp_connection::handle_read()
 {
-    handle_close();
+    std::size_t nr = inbuf_.read_fd(iow_.fd());
+    if (nr) {
+        if (read_cb_)
+            read_cb_(shared_from_this(), inbuf_);
+    } else
+        handle_close();
 }
 
 void tcp_connection::handle_write()

@@ -1,2 +1,2 @@
-_add_example(tcp_server_demo)
-_add_example(tcp_client_demo)
+_add_example(echo_server)
+_add_example(echo_client)

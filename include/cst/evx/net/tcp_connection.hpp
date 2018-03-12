@@ -14,6 +14,7 @@ class tcp_connection;
 using tcp_connection_ptr = std::shared_ptr<tcp_connection>;
 
 typedef std::function<void(const tcp_connection_ptr&)> connect_cb_t;
+typedef std::function<void(const tcp_connection_ptr&, buffer&)> read_cb_t;
 typedef std::function<void(const tcp_connection_ptr&)> write_cb_t;
 typedef std::function<void(const tcp_connection_ptr&)> close_cb_t;
 
@@ -26,6 +27,9 @@ public:
 
     void set_connect_callback(const connect_cb_t& cb)
     { connect_cb_ = cb; }
+
+    void set_read_callback(const read_cb_t& cb)
+    { read_cb_ = cb; }
 
     void set_write_callback(const write_cb_t& cb)
     { write_cb_ = cb; }
@@ -58,8 +62,10 @@ private:
     std::unique_ptr<socket> sock_;
     io_watcher iow_;
     connect_cb_t connect_cb_;
+    read_cb_t read_cb_;
     write_cb_t write_cb_;
     close_cb_t close_cb_;
+    buffer inbuf_;
     buffer outbuf_;
 };
 

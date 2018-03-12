@@ -2,6 +2,8 @@
 #define _CST_EVX_BUFFER_HPP
 
 #include <vector>
+#include <string>
+#include <cstring>
 
 namespace cst {
 namespace evx {
@@ -25,24 +27,42 @@ public:
     std::size_t prependable() const noexcept
     { return ridx_; }
 
+    std::size_t read_fd(int fd);
+
     void append(const char* data, std::size_t len)
     {
         ensure_writable_(len);
-        std::copy(data, data + len, wbegin_());
+        std::memmove(wbegin_(), data, len);
         widx_ += len;
     }
 
-    void take(std::size_t len) noexcept
+    std::size_t take(std::string& str)
     {
-       if (len < readable())
-           ridx_ += len;
-       else
-           take_all();
+        str = std::string(rbegin(), readable());
+        return take_all();
     }
 
-    void take_all() noexcept
+    std::size_t take(void* buf, std::size_t len) noexcept
     {
+        len = std::min(readable(), len);
+        std::memmove(buf, rbegin(), len);
+        return take(len);
+    }
+
+    std::size_t take(std::size_t len) noexcept
+    {
+       if (len < readable()) {
+           ridx_ += len;
+           return len;
+       } else
+           return take_all();
+    }
+
+    std::size_t take_all() noexcept
+    {
+        const auto len = readable();
         ridx_ = widx_ = init_prep_;
+        return len;
     }
 
 private:
