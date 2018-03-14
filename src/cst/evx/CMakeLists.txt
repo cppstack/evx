@@ -9,10 +9,6 @@ add_library(cst_evx
             core/pollers/poll_poller.cpp
             core/pollers/epoll_poller.cpp
             core/buffer.cpp
-            os/socket.cpp
-            os/openssl.cpp
-            net/socket_address.cpp
-            net/socket.cpp
             net/acceptor.cpp
             net/connector.cpp
             net/tcp_connection.cpp
@@ -23,11 +19,15 @@ add_library(cst_evx
 configure_file(${PROJECT_SOURCE_DIR}/config.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
+if(LNX_LOGGING)
+    target_compile_definitions(cst_evx PRIVATE LNX_LOGGING)
+endif()
+
 target_compile_options(cst_evx PRIVATE -Wall -Wextra -Wpointer-arith)
 
 target_include_directories(cst_evx PUBLIC  ${PROJECT_SOURCE_DIR}/include
                                    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
                                    PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-target_link_libraries(cst_evx PUBLIC  logging
+target_link_libraries(cst_evx PUBLIC  cst_logging cst_lnx
                               PRIVATE ${OPENSSL_LIBRARIES})

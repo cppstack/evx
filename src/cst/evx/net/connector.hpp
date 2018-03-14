@@ -2,11 +2,14 @@
 #define _CST_EVX_NET_CONNECTOR_HPP
 
 #include <cst/evx/core/watchers/io_watcher.hpp>
-#include "net/socket.hpp"
+#include <cst/lnx/socket.hpp>
 
 namespace cst {
 namespace evx {
 namespace net {
+
+using lnx::socket;
+using lnx::socket_address;
 
 class connector {
 public:

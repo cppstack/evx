@@ -2,14 +2,15 @@
 #define _CST_EVX_NET_TCP_CLIENT_HPP
 
 #include <cst/evx/core/event_loop.hpp>
-#include <cst/evx/net/socket_address.hpp>
 #include <cst/evx/net/tcp_connection.hpp>
+#include <cst/lnx/socket_address.hpp>
 
 namespace cst {
 namespace evx {
 namespace net {
 
-class socket;
+using lnx::socket_address;
+
 class connector;
 
 class tcp_client {

@@ -1,5 +1,5 @@
 #include <cst/evx/net/tcp_server.hpp>
-#include "net/socket.hpp"
+#include <cst/lnx/socket.hpp>
 #include "net/acceptor.hpp"
 
 namespace cst {

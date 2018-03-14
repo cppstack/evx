@@ -18,12 +18,13 @@ connector::connector(event_loop& loop, const socket_address& addr,
 
 void connector::start()
 {
+    int err;
     iow_.enable_rdwr();
 
     if (!host_.empty())
         ;
     else
-        sock_.connect(addr_);
+        sock_.connect(addr_, &err);
 }
 
 void connector::cancel()

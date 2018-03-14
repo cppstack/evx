@@ -1,5 +1,5 @@
 #include <cst/evx/net/tcp_connection.hpp>
-#include "net/socket.hpp"
+#include <cst/lnx/socket.hpp>
 
 namespace cst {
 namespace evx {

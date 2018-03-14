@@ -12,7 +12,10 @@ message(STATUS "Checking out dependent libraries...")
 execute_process(COMMAND git submodule update --init --recursive
                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
+set(LNX_LOGGING ON)
+
 add_subdirectory(src/cst/logging)
+add_subdirectory(src/cst/lnx)
 add_subdirectory(src/cst/evx)
 
 if(EVX_BUILD_EXAMPLES)

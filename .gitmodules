@@ -1,3 +1,6 @@
 [submodule "cppstack/logging"]
 	path = src/cst/logging
 	url = https://github.com/cppstack/logging
+[submodule "cppstack/lnx"]
+	path = src/cst/lnx
+	url = https://github.com/cppstack/lnx

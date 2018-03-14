@@ -1,5 +1,5 @@
 #include <cst/evx/core/buffer.hpp>
-#include "os/uio.hpp"
+#include <cst/lnx/os/uio.hpp>
 
 namespace cst {
 namespace evx {
@@ -9,13 +9,13 @@ std::size_t buffer::read_fd(int fd)
     char extrabuf[16384];
     const std::size_t writable_ = writable();
 
-    struct ::iovec iov[2];
+    lnx::iovec iov[2];
     iov[0].iov_base = wbegin_();
     iov[0].iov_len  = writable_;
     iov[1].iov_base = extrabuf;
     iov[1].iov_len  = sizeof extrabuf;
 
-    std::size_t nr = os::Readv(fd, iov, 2);
+    std::size_t nr = lnx::Readv(fd, iov, 2);
 
     if (nr <= writable_)
         widx_ += nr;

@@ -5,10 +5,12 @@
 #include <cst/evx/core/buffer.hpp>
 
 namespace cst {
+namespace lnx { class socket; }
+
 namespace evx {
 namespace net {
 
-class socket;
+using lnx::socket;
 
 class tcp_connection;
 using tcp_connection_ptr = std::shared_ptr<tcp_connection>;
