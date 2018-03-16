@@ -1,6 +1,5 @@
-#include <cst/evx/core/event_loop.hpp>
-#include <cst/lnx/os/poll.hpp>
 #include "core/pollers/poll_poller.hpp"
+#include <cst/evx/core/event_loop.hpp>
 
 namespace cst {
 namespace evx {
@@ -39,9 +38,9 @@ void poll_poller::modify(int fd, int /*oev*/, int nev)
 
 void poll_poller::poll(int timeout)
 {
-    size_t nr = lnx::Poll(pollfds_.data(), pollfds_.size(), timeout);
+    int nr = lnx::Poll(pollfds_.data(), pollfds_.size(), timeout);
 
-    for (auto it = pollfds_.cbegin(); nr && it != pollfds_.cend(); ++it)
+    for (auto it = pollfds_.cbegin(); nr > 0 && it != pollfds_.cend(); ++it)
         if (it->revents) {
             --nr;
 

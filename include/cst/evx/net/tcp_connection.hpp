@@ -1,6 +1,7 @@
 #ifndef _CST_EVX_NET_TCP_CONNECTION_HPP
 #define _CST_EVX_NET_TCP_CONNECTION_HPP
 
+#include <cst/evx/core/event_loop.hpp>
 #include <cst/evx/core/watchers/io_watcher.hpp>
 #include <cst/evx/core/buffer.hpp>
 
@@ -21,6 +22,8 @@ typedef std::function<void(const tcp_connection_ptr&)> write_cb_t;
 typedef std::function<void(const tcp_connection_ptr&)> close_cb_t;
 
 class tcp_connection : public std::enable_shared_from_this<tcp_connection> {
+    friend std::ostream& operator<<(std::ostream& os, const tcp_connection& c);
+
 public:
     tcp_connection(const tcp_connection&) = delete;
     tcp_connection& operator=(const tcp_connection&) = delete;
@@ -41,7 +44,7 @@ public:
 
     void established();
 
-    void send(const void* data, std::size_t len);
+    void send(const void* data, size_t len);
 
     void shutdown();
 
@@ -57,6 +60,7 @@ private:
     void handle_read();
     void handle_write();
     void handle_close();
+    void handle_error(int err = 0);
 
     void shutdown_();
 
@@ -69,6 +73,7 @@ private:
     close_cb_t close_cb_;
     buffer inbuf_;
     buffer outbuf_;
+    const logger_ptr& logger_;
 };
 
 }

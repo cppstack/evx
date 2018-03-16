@@ -22,13 +22,7 @@ public:
     event_loop(const event_loop&) = delete;
     event_loop& operator=(const event_loop&) = delete;
 
-    explicit event_loop(const logger_ptr& logger = nullptr);
-
-    static const logger_ptr& get_default_logger() noexcept
-    { return default_logger_; }
-
-    static void set_default_logger(const logger_ptr& logger) noexcept
-    { default_logger_ = logger; }
+    explicit event_loop(const logger_ptr& logger = logging::default_logger());
 
     const logger_ptr& logger() const noexcept
     { return logger_; }
@@ -54,8 +48,6 @@ private: /* internal used */
     void fd_sync_();
 
     void invoke_pendings_();
-
-    static logger_ptr default_logger_;
 
     const int waittime_ = 30000;
 

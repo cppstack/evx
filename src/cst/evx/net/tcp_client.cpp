@@ -1,11 +1,12 @@
 #include <cst/evx/net/tcp_client.hpp>
+#include <cst/logging/logger.hpp>
 #include "net/connector.hpp"
 
 namespace cst {
 namespace evx {
 namespace net {
 
-tcp_client::tcp_client(event_loop& loop, const socket_address& addr)
+tcp_client::tcp_client(event_loop& loop, const inet_address& addr)
     : loop_(loop),
       connector_(std::make_unique<connector>(loop, addr,
           std::bind(&tcp_client::new_connection_, this, std::placeholders::_1))),

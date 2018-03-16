@@ -18,7 +18,7 @@ timer_watcher::timer_watcher(event_loop& loop,
     const auto tpns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_point.time_since_epoch());
     const auto sc = std::nano::den;
 
-    struct ::itimerspec tspec;
+    lnx::itimerspec tspec;
     tspec.it_value.tv_sec = tpns.count() / sc;
     tspec.it_value.tv_nsec = tpns.count() % sc;
     tspec.it_interval.tv_sec = interval.count() / sc;
@@ -39,7 +39,7 @@ timer_watcher::timer_watcher(event_loop& loop,
 
     const auto sc = std::nano::den;
 
-    struct ::itimerspec tspec;
+    lnx::itimerspec tspec;
     tspec.it_value.tv_sec = time.count() / sc;
     tspec.it_value.tv_nsec = time.count() % sc;
     tspec.it_interval.tv_sec = interval.count() / sc;

@@ -1,10 +1,12 @@
 #ifndef _CST_EVX_POLLER_HPP
 #define _CST_EVX_POLLER_HPP
 
-#include <cst/evx/core/logger_ptr.hpp>
+#include <cst/logging/logger_ptr.hpp>
 
 namespace cst {
 namespace evx {
+
+using logging::logger_ptr;
 
 class event_loop;
 

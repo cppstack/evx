@@ -7,7 +7,7 @@ namespace evx = cst::evx;
 
 class echo_client : public evx::net::tcp_client {
 public:
-    echo_client(evx::event_loop& loop, const evx::net::socket_address& addr)
+    echo_client(evx::event_loop& loop, const evx::net::inet_address& addr)
         : tcp_client(loop, addr),
           w_stdin_(loop, STDIN_FILENO, evx::ev_in,
                    std::bind(&echo_client::on_stdin_read, this,
@@ -55,7 +55,7 @@ int main()
 {
     evx::event_loop loop;
     // loop.logger()->set_level(cst::logging::debug);
-    echo_client cli(loop, evx::net::socket_address("127.0.0.1", 3033));
+    echo_client cli(loop, evx::net::inet_address("127.0.0.1", 3033));
     cli.connect();
     loop.run();
     return 0;

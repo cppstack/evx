@@ -1,4 +1,5 @@
 #include <cst/evx/net/tcp_connection.hpp>
+#include <cst/logging/logger.hpp>
 #include <cst/lnx/socket.hpp>
 
 namespace cst {
@@ -9,8 +10,11 @@ tcp_connection::tcp_connection(event_loop& loop, socket&& sock)
     : state_(connecting_),
       sock_(std::make_unique<socket>(std::move(sock))),
       iow_(loop, sock_->fd(), ev_in,
-           std::bind(&tcp_connection::io_handler_, this, std::placeholders::_1))
-{ }
+          std::bind(&tcp_connection::io_handler_, this, std::placeholders::_1)),
+      logger_(loop.logger())
+{
+    sock_->throw_exception(false);
+}
 
 void tcp_connection::established()
 {
@@ -20,13 +24,23 @@ void tcp_connection::established()
         connect_cb_(shared_from_this());
 }
 
-void tcp_connection::send(const void* data, std::size_t len)
+void tcp_connection::send(const void* data, size_t len)
 {
-    std::size_t nsent = 0;
-    std::size_t rem = len;
+    if (state_ != connected_) {
+        LOG_ERROR(logger_) << *this << ", unconnected.";
+        return;
+    }
+
+    ssize_t nsent = 0;
+    size_t rem = len;
 
     if (outbuf_.readable() == 0) {
         nsent = sock_->send(data, len);
+        if (nsent == -1) {
+            LOG_ERROR(logger_) << *this << ", SO_ERROR = " << sock_->error();
+            return;
+        }
+
         rem -= nsent;
     }
 
@@ -67,23 +81,34 @@ void tcp_connection::io_handler_(io_watcher& iow)
 
     if (iow.revents() & ev_hup)
         handle_close();
+
+    if (iow.revents() & ev_err)
+        handle_error();
 }
 
 void tcp_connection::handle_read()
 {
-    std::size_t nr = inbuf_.read_fd(iow_.fd());
-    if (nr) {
+    int err = 0;
+    ssize_t n = inbuf_.read_fd(iow_.fd(), &err);
+    if (n > 0) {
         if (read_cb_)
             read_cb_(shared_from_this(), inbuf_);
-    } else
+    } else if (n == 0)
         handle_close();
+    else
+        handle_error(err);
 }
 
 void tcp_connection::handle_write()
 {
     if (iow_.is_writing()) {
         /* still interested in write */
-        std::size_t n = sock_->send(outbuf_.rbegin(), outbuf_.readable());
+        ssize_t n = sock_->send(outbuf_.rbegin(), outbuf_.readable());
+        if (n == -1) {
+            handle_error();
+            return;
+        }
+
         outbuf_.take(n);
 
         if (outbuf_.readable() == 0) {
@@ -110,10 +135,22 @@ void tcp_connection::handle_close()
     close_cb_(shared_from_this());
 }
 
+void tcp_connection::handle_error(int err)
+{
+    LOG_ERROR(logger_) << *this << ", SO_ERROR = "
+                       << (err ? err : sock_->error());
+}
+
 void tcp_connection::shutdown_()
 {
     if (!iow_.is_writing())
         sock_->shutdown(SHUT_WR);
+}
+
+std::ostream& operator<<(std::ostream& os, const tcp_connection& c)
+{
+    return os << "tcp_connection[fd=" << c.sock_->fd()
+              << ", state=" << c.state_ << "]";
 }
 
 }

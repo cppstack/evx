@@ -9,16 +9,16 @@ namespace evx {
 namespace net {
 
 using lnx::socket;
-using lnx::socket_address;
+using lnx::inet_address;
 
 class acceptor {
 public:
     acceptor(const acceptor&) = delete;
     acceptor& operator=(const acceptor&) = delete;
 
-    typedef std::function<void(socket&&, const socket_address&)> accept_cb_t;
+    typedef std::function<void(socket&&, const inet_address&)> accept_cb_t;
 
-    acceptor(event_loop& loop, const socket_address& addr, const accept_cb_t& cb)
+    acceptor(event_loop& loop, const inet_address& addr, const accept_cb_t& cb)
         : sock_(socket::tcp_bind(addr)),
           iow_(loop, sock_.fd(), ev_none,
                std::bind(&acceptor::io_handler_, this, std::placeholders::_1)),

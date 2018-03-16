@@ -4,10 +4,10 @@
 namespace cst {
 namespace evx {
 
-std::size_t buffer::read_fd(int fd)
+ssize_t buffer::read_fd(int fd, int* err)
 {
     char extrabuf[16384];
-    const std::size_t writable_ = writable();
+    const size_t writable_ = writable();
 
     lnx::iovec iov[2];
     iov[0].iov_base = wbegin_();
@@ -15,11 +15,11 @@ std::size_t buffer::read_fd(int fd)
     iov[1].iov_base = extrabuf;
     iov[1].iov_len  = sizeof extrabuf;
 
-    std::size_t nr = lnx::Readv(fd, iov, 2);
+    ssize_t nr = lnx::Readv(fd, iov, 2, err);
 
-    if (nr <= writable_)
+    if (nr >= 0 && (size_t) nr <= writable_)
         widx_ += nr;
-    else {
+    else if ((size_t) nr > writable_) {
         widx_ = buf_.size();
         append(extrabuf, nr - writable_);
     }
@@ -27,9 +27,9 @@ std::size_t buffer::read_fd(int fd)
     return nr;
 }
 
-void buffer::grow_(std::size_t len)
+void buffer::grow_(size_t len)
 {
-    const std::size_t nread = readable();
+    const size_t nread = readable();
 
     if (len <= prependable() - init_prep_ + writable()) {
         std::memmove(pbegin_(), rbegin_(), nread);

@@ -1,5 +1,6 @@
 #include <cst/evx/core/watcher.hpp>
 #include <cst/evx/core/event_loop.hpp>
+#include <ostream>
 
 namespace cst {
 namespace evx {
@@ -24,6 +25,12 @@ void watcher::disable_events(int ev)
         events_ &= ~ev;
         loop_.fd_change(fd_);
     }
+}
+
+std::ostream& operator<<(std::ostream& os, const watcher& w)
+{
+    return os << "watcher[type='" << watcher_type_text[w.type_]
+              << "', fd=" << w.fd_ << "]";
 }
 
 }

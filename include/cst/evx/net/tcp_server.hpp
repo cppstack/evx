@@ -3,14 +3,14 @@
 
 #include <cst/evx/core/event_loop.hpp>
 #include <cst/evx/net/tcp_connection.hpp>
-#include <cst/lnx/socket_address.hpp>
+#include <cst/lnx/inet_address.hpp>
 #include <set>
 
 namespace cst {
 namespace evx {
 namespace net {
 
-using lnx::socket_address;
+using lnx::inet_address;
 
 class acceptor;
 
@@ -19,7 +19,7 @@ public:
     tcp_server(const tcp_server&) = delete;
     tcp_server& operator=(const tcp_server&) = delete;
 
-    tcp_server(event_loop& loop, const socket_address& addr);
+    tcp_server(event_loop& loop, const inet_address& addr);
 
     void start();
 
@@ -35,7 +35,7 @@ public:
     ~tcp_server();
 
 private:
-    void new_connection_(socket&&, const socket_address&);
+    void new_connection_(socket&&, const inet_address&);
     void end_connection_(const tcp_connection_ptr&);
 
     event_loop& loop_;

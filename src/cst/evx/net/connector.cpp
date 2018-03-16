@@ -1,12 +1,13 @@
-#include <cst/evx/core/event_loop.hpp>
 #include "net/connector.hpp"
+#include <cst/evx/core/event_loop.hpp>
+#include <cst/logging/logger.hpp>
 #include <sstream>
 
 namespace cst {
 namespace evx {
 namespace net {
 
-connector::connector(event_loop& loop, const socket_address& addr,
+connector::connector(event_loop& loop, const inet_address& addr,
                      const connect_cb_t& cb)
     : sock_(addr.family(), SOCK_STREAM | SOCK_NONBLOCK, 0),
       addr_(addr),
@@ -18,13 +19,14 @@ connector::connector(event_loop& loop, const socket_address& addr,
 
 void connector::start()
 {
-    int err;
+    sock_.throw_exception(false);
+
     iow_.enable_rdwr();
 
     if (!host_.empty())
         ;
     else
-        sock_.connect(addr_, &err);
+        sock_.connect(addr_);
 }
 
 void connector::cancel()

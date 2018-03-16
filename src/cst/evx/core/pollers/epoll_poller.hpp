@@ -2,7 +2,7 @@
 #define _CST_EVX_EPOLL_POLLER_HPP
 
 #include "core/poller.hpp"
-#include <sys/epoll.h>
+#include <cst/lnx/os/epoll.hpp>
 
 #include <vector>
 #include <set>
@@ -19,7 +19,7 @@ public:
 
 private:
     int epfd_ = -1;
-    std::vector<struct ::epoll_event> events_;
+    std::vector<lnx::epoll_event> events_;
     std::set<int> eperm_fds_;
 };
 

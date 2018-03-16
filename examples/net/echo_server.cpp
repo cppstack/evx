@@ -5,7 +5,7 @@ namespace evx = cst::evx;
 
 class echo_server : public evx::net::tcp_server {
 public:
-    echo_server(evx::event_loop& loop, const evx::net::socket_address& addr)
+    echo_server(evx::event_loop& loop, const evx::net::inet_address& addr)
         : tcp_server(loop, addr)
     {
         set_read_callback(std::bind(&echo_server::on_read, this,
@@ -25,7 +25,7 @@ int main()
 {
     evx::event_loop loop;
     // loop.logger()->set_level(cst::logging::debug);
-    echo_server serv(loop, evx::net::socket_address("::", 3033));
+    echo_server serv(loop, evx::net::inet_address("::", 3033));
     serv.start();
     loop.run();
     return 0;

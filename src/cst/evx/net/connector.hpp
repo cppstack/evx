@@ -9,7 +9,7 @@ namespace evx {
 namespace net {
 
 using lnx::socket;
-using lnx::socket_address;
+using lnx::inet_address;
 
 class connector {
 public:
@@ -18,8 +18,7 @@ public:
 
     typedef std::function<void(socket&&)> connect_cb_t;
 
-    connector(event_loop& loop, const socket_address& addr,
-              const connect_cb_t& cb);
+    connector(event_loop& loop, const inet_address& addr, const connect_cb_t& cb);
 
     void start();
     void cancel();
@@ -33,7 +32,7 @@ private:
 
     std::string host_;
     std::string port_;
-    socket_address addr_;
+    inet_address addr_;
 
     io_watcher iow_;
     connect_cb_t connect_cb_;

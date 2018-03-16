@@ -1,11 +1,12 @@
 #ifndef _CST_EVX_WATCHER_HPP
 #define _CST_EVX_WATCHER_HPP
 
-#include <cst/evx/core/logger_ptr.hpp>
-#include <ostream>
+#include <cst/logging/logger_ptr.hpp>
 
 namespace cst {
 namespace evx {
+
+using logging::logger_ptr;
 
 enum watch_t {
     w_io,
@@ -64,12 +65,6 @@ protected:
 
     const logger_ptr& logger_;
 };
-
-inline std::ostream& operator<<(std::ostream& os, const watcher& w)
-{
-    return os << "watcher[type='" << watcher_type_text[w.type_]
-              << "', fd=" << w.fd_ << "]";
-}
 
 }
 }

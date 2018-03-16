@@ -1,7 +1,7 @@
-#include <cst/evx/core/event_loop.hpp>
-#include <cst/lnx/os/epoll.hpp>
-#include <cst/logging/logger.hpp>
 #include "core/pollers/epoll_poller.hpp"
+#include <cst/evx/core/event_loop.hpp>
+#include <cst/lnx/error.hpp>
+#include <cst/logging/logger.hpp>
 
 namespace cst {
 namespace evx {
@@ -35,7 +35,7 @@ void epoll_poller::modify(int fd, int oev, int nev)
             }
         }
     } else {
-        struct ::epoll_event event;
+        lnx::epoll_event event;
         event.events = nev;
         event.data.fd = fd;
         int err = 0;
@@ -71,14 +71,14 @@ void epoll_poller::poll(int timeout)
         timeout = 0;
     }
 
-    size_t nr = lnx::Epoll_wait(epfd_, events_.data(), events_.size(), timeout);
+    int nr = lnx::Epoll_wait(epfd_, events_.data(), events_.size(), timeout);
 
-    for (size_t i = 0; i < nr; ++i) {
+    for (int i = 0; i < nr; ++i) {
         int ev = events_[i].events & (EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP);
         loop_.fd_event(events_[i].data.fd, ev);
     }
 
-    if (nr && nr == events_.size()) {
+    if (nr > 0 && (size_t) nr == events_.size()) {
         events_.clear();
         events_.resize(nr << 1);
     }

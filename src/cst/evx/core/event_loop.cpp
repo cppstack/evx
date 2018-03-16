@@ -5,14 +5,14 @@
 namespace cst {
 namespace evx {
 
-logger_ptr event_loop::default_logger_ = logging::trivial_stderr_logger("libevx");
+const logger_ptr evx_default_logger = logging::trivial_stderr_logger("libevx");
 
 event_loop::event_loop(const logger_ptr& logger)
     : logger_(logger),
       poller_(poller::new_poller(*this))
 {
     if (!logger_)
-        logger_ = get_default_logger();
+        logger_ = evx_default_logger;
 }
 
 void event_loop::add_watcher(watcher* w)

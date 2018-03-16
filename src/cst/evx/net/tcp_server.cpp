@@ -1,4 +1,5 @@
 #include <cst/evx/net/tcp_server.hpp>
+#include <cst/logging/logger.hpp>
 #include <cst/lnx/socket.hpp>
 #include "net/acceptor.hpp"
 
@@ -6,7 +7,7 @@ namespace cst {
 namespace evx {
 namespace net {
 
-tcp_server::tcp_server(event_loop& loop, const socket_address& addr)
+tcp_server::tcp_server(event_loop& loop, const inet_address& addr)
     : loop_(loop),
       acceptor_(std::make_unique<acceptor>(loop, addr,
           std::bind(&tcp_server::new_connection_, this,
@@ -19,7 +20,7 @@ void tcp_server::start()
     acceptor_->listen();
 }
 
-void tcp_server::new_connection_(socket&& sock, const socket_address& peer)
+void tcp_server::new_connection_(socket&& sock, const inet_address& peer)
 {
     tcp_connection_ptr conn =
         std::make_shared<tcp_connection>(loop_, std::move(sock));

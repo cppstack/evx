@@ -3,13 +3,13 @@
 
 #include <cst/evx/core/event_loop.hpp>
 #include <cst/evx/net/tcp_connection.hpp>
-#include <cst/lnx/socket_address.hpp>
+#include <cst/lnx/inet_address.hpp>
 
 namespace cst {
 namespace evx {
 namespace net {
 
-using lnx::socket_address;
+using lnx::inet_address;
 
 class connector;
 
@@ -18,7 +18,7 @@ public:
     tcp_client(const tcp_client&) = delete;
     tcp_client& operator=(const tcp_client&) = delete;
 
-    tcp_client(event_loop& loop, const socket_address& addr);
+    tcp_client(event_loop& loop, const inet_address& addr);
 
     void set_connect_callback(const connect_cb_t& cb)
     { connect_cb_ = cb; }
