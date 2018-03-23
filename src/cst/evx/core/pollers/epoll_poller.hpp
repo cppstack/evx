@@ -2,7 +2,7 @@
 #define _CST_EVX_EPOLL_POLLER_HPP
 
 #include "core/poller.hpp"
-#include <cst/lnx/os/epoll.hpp>
+#include <cst/lnx/os/epoll.h>
 
 #include <vector>
 #include <set>

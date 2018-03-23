@@ -88,15 +88,15 @@ void tcp_connection::io_handler_(io_watcher& iow)
 
 void tcp_connection::handle_read()
 {
-    int err = 0;
-    ssize_t n = inbuf_.read_fd(iow_.fd(), &err);
+    std::error_code ec;
+    ssize_t n = inbuf_.read_fd(iow_.fd(), &ec);
     if (n > 0) {
         if (read_cb_)
             read_cb_(shared_from_this(), inbuf_);
     } else if (n == 0)
         handle_close();
     else
-        handle_error(err);
+        handle_error(ec);
 }
 
 void tcp_connection::handle_write()
@@ -135,10 +135,14 @@ void tcp_connection::handle_close()
     close_cb_(shared_from_this());
 }
 
-void tcp_connection::handle_error(int err)
+void tcp_connection::handle_error()
 {
-    LOG_ERROR(logger_) << *this << ", SO_ERROR = "
-                       << (err ? err : sock_->error());
+    LOG_ERROR(logger_) << *this << ", " << sock_->error().message();
+}
+
+void tcp_connection::handle_error(const std::error_code& ec)
+{
+    LOG_ERROR(logger_) << *this << ", " << ec.message();
 }
 
 void tcp_connection::shutdown_()

@@ -18,25 +18,18 @@ public:
 
     typedef std::function<void(socket&&, const inet_address&)> accept_cb_t;
 
-    acceptor(event_loop& loop, const inet_address& addr, const accept_cb_t& cb)
-        : sock_(socket::tcp_bind(addr)),
-          iow_(loop, sock_.fd(), ev_none,
-               std::bind(&acceptor::io_handler_, this, std::placeholders::_1)),
-          accept_cb_(cb)
-    { }
+    acceptor(event_loop& loop, const inet_address& addr, const accept_cb_t& cb);
 
-    void listen(size_t backlog = SOMAXCONN)
-    {
-        iow_.enable_read();
-        sock_.listen(backlog);
-    }
+    void listen(size_t backlog = SOMAXCONN);
 
 private:
     void io_handler_(io_watcher&);
 
+    event_loop& loop_;
     socket sock_;
     io_watcher iow_;
     accept_cb_t accept_cb_;
+    const logger_ptr& logger_;
 };
 
 }

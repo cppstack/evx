@@ -1,7 +1,7 @@
 #include <cst/evx/core/watchers/timer_watcher.hpp>
 #include <cst/evx/core/event_loop.hpp>
 #include <cst/logging/logger.hpp>
-#include <cst/lnx/os/time.hpp>
+#include <cst/lnx/os/time.h>
 #include <unistd.h>
 
 namespace cst {

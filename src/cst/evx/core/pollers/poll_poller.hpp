@@ -2,7 +2,7 @@
 #define _CST_EVX_POLL_POLLER_HPP
 
 #include "core/poller.hpp"
-#include <cst/lnx/os/poll.hpp>
+#include <cst/lnx/os/poll.h>
 
 #include <vector>
 #include <map>

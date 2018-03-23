@@ -60,7 +60,8 @@ private:
     void handle_read();
     void handle_write();
     void handle_close();
-    void handle_error(int err = 0);
+    void handle_error();
+    void handle_error(const std::error_code& ec);
 
     void shutdown_();
 

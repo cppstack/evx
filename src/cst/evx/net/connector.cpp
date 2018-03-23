@@ -15,12 +15,12 @@ connector::connector(event_loop& loop, const inet_address& addr,
            std::bind(&connector::io_handler_, this, std::placeholders::_1)),
       connect_cb_(cb),
       logger_(loop.logger())
-{ }
+{
+    sock_.throw_exception(false);
+}
 
 void connector::start()
 {
-    sock_.throw_exception(false);
-
     iow_.enable_rdwr();
 
     if (!host_.empty())

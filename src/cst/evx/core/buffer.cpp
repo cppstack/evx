@@ -1,10 +1,10 @@
 #include <cst/evx/core/buffer.hpp>
-#include <cst/lnx/os/uio.hpp>
+#include <cst/lnx/os/uio.h>
 
 namespace cst {
 namespace evx {
 
-ssize_t buffer::read_fd(int fd, int* err)
+ssize_t buffer::read_fd(int fd, std::error_code* ec)
 {
     char extrabuf[16384];
     const size_t writable_ = writable();
@@ -15,7 +15,7 @@ ssize_t buffer::read_fd(int fd, int* err)
     iov[1].iov_base = extrabuf;
     iov[1].iov_len  = sizeof extrabuf;
 
-    ssize_t nr = lnx::Readv(fd, iov, 2, err);
+    ssize_t nr = lnx::Readv(fd, iov, 2, ec);
 
     if (nr >= 0 && (size_t) nr <= writable_)
         widx_ += nr;

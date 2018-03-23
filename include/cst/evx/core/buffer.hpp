@@ -2,8 +2,8 @@
 #define _CST_EVX_BUFFER_HPP
 
 #include <vector>
-#include <string>
 #include <cstring>
+#include <system_error>
 
 namespace cst {
 namespace evx {
@@ -27,7 +27,7 @@ public:
     size_t prependable() const noexcept
     { return ridx_; }
 
-    ssize_t read_fd(int fd, int* err = nullptr);
+    ssize_t read_fd(int fd, std::error_code* ec = nullptr);
 
     void append(const char* data, size_t len)
     {

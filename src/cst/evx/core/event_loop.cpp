@@ -1,9 +1,14 @@
-#include <cst/logging/logger/trivial_loggers.hpp>
 #include <cst/evx/core/event_loop.hpp>
+#include <cst/evx/core/watchers/io_watcher.hpp>
+#include <cst/lnx/os/eventfd.h>
+#include <cst/logging/logger/trivial_loggers.hpp>
 #include "core/poller.hpp"
+#include <unistd.h>
 
 namespace cst {
 namespace evx {
+
+thread_local event_loop* event_loop::thread_loop_ = nullptr;
 
 const logger_ptr evx_default_logger = logging::trivial_stderr_logger("libevx");
 
@@ -13,6 +18,22 @@ event_loop::event_loop(const logger_ptr& logger)
 {
     if (!logger_)
         logger_ = evx_default_logger;
+
+    if (thread_loop_ != nullptr)
+        throw std::logic_error("event_loop existed in thread");
+
+    thread_loop_ = this;
+
+    evfd_ = lnx::Eventfd(0, 0);
+    fnw_ = std::make_unique<io_watcher>(*this, evfd_, ev_in,
+        [this](io_watcher& w) {
+            uint64_t cnt;
+            if (::read(w.fd(), &cnt, 8) != 8) {
+                LOG_CRIT(logger_) << "eventfd read() error";
+                w.disable_read();
+            }
+        }
+    );
 }
 
 void event_loop::add_watcher(watcher* w)
@@ -95,7 +116,7 @@ void event_loop::feed_event(watcher* w, int revents)
         if (! w->pending()) {
             w->revents_ = ev;
             w->pending_ = true;
-            pendings_.push_back(w);
+            pending_events_.push_back(w);
         } else
             w->revents_ |= ev;
     }
@@ -106,8 +127,41 @@ void event_loop::run()
     for (;;) {
         fd_sync_();
         poller_->poll(waittime_);
-        invoke_pendings_();
+        invoke_pending_events_();
+        invoke_pending_functors_();
     }
+}
+
+void event_loop::assert_in_loop_thread()
+{
+    if (!in_loop_thread_())
+        throw std::logic_error("not in loop thread");
+}
+
+void event_loop::run_in_loop_(const functor_t& fn)
+{
+    if (in_loop_thread_())
+        fn();
+    else
+        queue_in_loop_(fn);
+}
+
+void event_loop::queue_in_loop_(const functor_t& fn)
+{
+    {
+        std::lock_guard<std::mutex> lock(pfmtx_);
+        pending_functors_.push_back(fn);
+    }
+
+    if (!in_loop_thread_() || invoking_functors_)
+        notify_();
+}
+
+void event_loop::notify_()
+{
+    uint64_t one = 1;
+    if (::write(evfd_, &one, 8) != 8)
+        LOG_CRIT(logger_) << "eventfd write() error";
 }
 
 void event_loop::fd_sync_()
@@ -132,22 +186,45 @@ void event_loop::fd_sync_()
     changed_fds_.clear();
 }
 
-void event_loop::invoke_pendings_()
+void event_loop::invoke_pending_events_()
 {
-    while (! pendings_.empty()) {
-        auto& w = pendings_.front();
+    while (!pending_events_.empty()) {
+        auto& w = pending_events_.front();
         w->pending_ = false;
         /* TODO: catch exceptions ? */
         w->handle();
-        pendings_.pop_front();
+        pending_events_.pop_front();
     }
+}
+
+void event_loop::invoke_pending_functors_()
+{
+    std::list<functor_t> functors;
+    invoking_functors_ = true;
+
+    {
+        std::lock_guard<std::mutex> lock(pfmtx_);
+        pending_functors_.swap(functors);
+    }
+
+    while (!functors.empty()) {
+        /* TODO: catch exceptions ? */
+        functors.front()();
+        functors.pop_front();
+    }
+
+    invoking_functors_ = false;
 }
 
 /*
  * Defining destructor here so that it sees the poller's definitioin,
  * in order to make the destruction of unique_ptr<poller> work.
  */
-event_loop::~event_loop() = default;
+event_loop::~event_loop()
+{
+    ::close(evfd_);
+    thread_loop_ = nullptr;
+}
 
 }
 }

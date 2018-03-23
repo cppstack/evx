@@ -1,6 +1,6 @@
 #include "core/pollers/epoll_poller.hpp"
 #include <cst/evx/core/event_loop.hpp>
-#include <cst/lnx/error.hpp>
+#include <cst/lnx/error/throw.hpp>
 #include <cst/logging/logger.hpp>
 
 namespace cst {
@@ -24,39 +24,39 @@ void epoll_poller::modify(int fd, int oev, int nev)
              * we really need to delete it.
              * this only happens when we got events from a non-interested fd
              */
-            int err = 0;
-            lnx::Epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, nullptr, &err);
-            if (err) {
-                if (err == EPERM) {
+            std::error_code ec;
+            lnx::Epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, nullptr, &ec);
+            if (ec) {
+                if (ec.value() == EPERM) {
                     if (!eperm_fds_.erase(fd))
                         LOG_ERROR(logger_) << "eperm_fd(" << fd << ") not found";
                 } else
-                    lnx::throw_system_error(err, "epoll_ctl()", logger_);
+                    lnx::throw_system_error(ec, "epoll_ctl()", logger_);
             }
         }
     } else {
         lnx::epoll_event event;
         event.events = nev;
         event.data.fd = fd;
-        int err = 0;
+        std::error_code ec;
 
         if (!oev) {
-            lnx::Epoll_ctl(epfd_, EPOLL_CTL_ADD, fd, &event, &err);
-            if (err) {
-                if (err == EPERM) {
+            lnx::Epoll_ctl(epfd_, EPOLL_CTL_ADD, fd, &event, &ec);
+            if (ec) {
+                if (ec.value() == EPERM) {
                     LOG_NOTICE(logger_) << "epoll_ctl() EPERM, fd: " << fd;
                     eperm_fds_.insert(fd);
                 } else
-                    lnx::throw_system_error(err, "epoll_ctl()", logger_);
+                    lnx::throw_system_error(ec, "epoll_ctl()", logger_);
             }
         } else {
-            lnx::Epoll_ctl(epfd_, EPOLL_CTL_MOD, fd, &event, &err);
-            if (err) {
-                if (err == EPERM) {
+            lnx::Epoll_ctl(epfd_, EPOLL_CTL_MOD, fd, &event, &ec);
+            if (ec) {
+                if (ec.value() == EPERM) {
                     if (!eperm_fds_.count(fd))
                         LOG_ERROR(logger_) << "eperm_fd(" << fd << ") not found";
                 } else
-                    lnx::throw_system_error(err, "epoll_ctl()", logger_);
+                    lnx::throw_system_error(ec, "epoll_ctl()", logger_);
             }
         }
     }
