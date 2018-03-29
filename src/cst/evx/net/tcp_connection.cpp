@@ -96,7 +96,7 @@ void tcp_connection::handle_read()
     } else if (n == 0)
         handle_close();
     else
-        handle_error(ec);
+        handle_error();
 }
 
 void tcp_connection::handle_write()
@@ -137,12 +137,7 @@ void tcp_connection::handle_close()
 
 void tcp_connection::handle_error()
 {
-    LOG_ERROR(logger_) << *this << ", " << sock_->error().message();
-}
-
-void tcp_connection::handle_error(const std::error_code& ec)
-{
-    LOG_ERROR(logger_) << *this << ", " << ec.message();
+    LOG_ERROR(logger_) << *this << ", SO_ERROR=" << sock_->so_error();
 }
 
 void tcp_connection::shutdown_()
